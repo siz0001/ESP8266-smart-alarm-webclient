@@ -10,7 +10,7 @@
 - 코드상 기본값은 192.169.1.200 이나, 이미 사용하고 있을경우  store/index.js 에서 ip값 수정 가능
 
 ## build & run
-- build후 dist 폴더에 run.bat 를 실행하면 local server가 시작됨. 이때 같은 라우터로 연결되어있어야 함. 
+- build후 dist 폴더에 run.bat 를 실행하면 local server가 시작됨. 이때 ESP8266과 같은 라우터로 연결되어있어야 함. 
 - 외부에서 ESP8266에 연결할 경우 포트가 차단되어 정상적으로 값이 수신되지 않을 수 있음.
 
 
