@@ -1,61 +1,111 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-pwa" target="_blank" rel="noopener">pwa</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-router" target="_blank" rel="noopener">router</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-vuex" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+  <v-container fill-height>
+    <v-card class="mx-auto" flat width="400">
+
+      <v-card-text class="indigo--text text-center text-h2 font-italic font-weight-bold">
+      
+        <strong>  {{ distance.distance }}  </strong>
+          <v-progress-linear
+      color="deep-purple"
+      :buffer-value="peak"
+      :value="distance.distance"
+      stream
+    ></v-progress-linear>
+      </v-card-text>
+      
+        <v-card  outlined height="200" class="d-flex mx-auto align-center">
+          <v-scroll-x-transition>
+          <v-img transtion="v-scroll-y-transition" v-if="isPlaying" max-width="100" src="@/assets/walking.svg" class="mx-auto"> </v-img>
+          </v-scroll-x-transition>
+        </v-card>        
+      <!--
+      <v-card>
+        <v-card-text>
+          데이터 업뎃이 안될경우 송신기 접속 아이피를 바꿔보세요.
+          <v-select
+            :items="items"
+            v-model="selected"
+            label="아이피 끝자리 선택"
+            @change="changeIp(selected)"
+          ></v-select>
+        </v-card-text>
+        
+      </v-card>
+      -->
+      <v-card-actions>
+          <v-btn @click="play" depressed color="purple" dark>
+            <v-icon> mdi-speaker </v-icon>
+            작동 테스트
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-chip color="deep-purple" dark class="ma-2">
+            기준거리 : {{this.peak}} cm
+          </v-chip>          
+          <v-btn v-if="peak<100" icon @click="peak=peak+10" depressed color="pink" class="pa-0">
+            <v-icon large>mdi-arrow-up-bold-circle-outline</v-icon>            
+          </v-btn>
+          <v-btn v-else icon  depressed color="pink" class="pa-0">
+            <v-icon large>mdi-arrow-up-bold-circle-outline</v-icon>            
+          </v-btn>
+
+          <v-btn  v-if="peak>0" icon @click="peak=peak-10" depressed color="pink" class="pa-0">
+            <v-icon large>mdi-arrow-down-bold-circle-outline</v-icon>
+            
+          </v-btn>
+          <v-btn  v-else icon depressed color="pink" class="pa-0">
+            <v-icon large>mdi-arrow-down-bold-circle-outline</v-icon>
+            
+          </v-btn>
+        </v-card-actions>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
-export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
-}
-</script>
+import { mapState, mapActions, mapMutations } from "vuex";
+import { useSound } from "@vueuse/sound";
+import trumpetSfx from "@/assets/3.mp3";
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
+export default {
+  data: () => ({
+    intervalId: null,
+    items: ["31", "32", "33", "34", "35", "36", "37", "38"],
+    selected: null,
+    peak:30
+  }),
+  async created() {
+    await this.getDistance();
+    this.onLoad();
+  },
+  computed: {
+    ...mapState(["distance"]),
+  },
+  methods: {
+    ...mapActions(["getDistance"]),
+    ...mapMutations(["changeIp"]),
+    onLoad() {
+      this.intervalId = setInterval(() => {
+        this.getDistance();
+        if (this.distance.distance > this.peak) {
+          if (!this.isPlaying) {
+            this.play();
+          }
+        }
+      }, 100);
+    },
+  },
+
+  beforeDestroy() {
+    clearInterval(this.intervalId);
+  },
+  setup() {
+    const { play, stop, isPlaying } = useSound(trumpetSfx);
+
+    return {
+      play,
+      stop,
+      isPlaying,
+    };
+  },
+};
+</script>
