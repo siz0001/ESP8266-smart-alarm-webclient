@@ -7,7 +7,7 @@
 
 ## router 세팅
 - ESP8266과 연결되는 라우터 옵션 설정으로 ESP8266의 접속 IP를 내부 IP로 고정
-- 코드상 기본값은 192.169.1.200 이나, 이미 사용하고 있을경우  store/index.js 에서 ip값 수정 가능
+- server IP 기본값은 192.169.1.200 이나, 이미 사용하고 있어 다른 IP를 사용해야 할 경우  store/index.js 에서 수정 가능
 
 ## build & run
 - build후 dist 폴더에 run.bat 를 실행하면 local server가 시작됨. 이때 ESP8266과 같은 라우터로 연결되어있어야 함. 
