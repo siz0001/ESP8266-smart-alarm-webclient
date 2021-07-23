@@ -16,3 +16,4 @@
 - 외부에서 ESP8266에 연결할 경우 포트가 차단되어 정상적으로 값이 수신되지 않을 수 있음.
 
 
+<a href="https://github.com/siz0001/ESP8266-smart-alarm-webserver">server</a>  참조
